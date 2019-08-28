@@ -8,7 +8,7 @@ version 0.001
 
 # SYNOPSIS
 
-This module provides methods to make it easy to connect to the Puppet DB and to put the data into forms where it can
+This module provides methods to make it easy to connect to the Puppet DB and to put the data into a form where it can
 be manipulated more readily.
 
 It can extract anything from the Puppet DB that is supported by the API.  See the Puppet docs for more information on
@@ -125,8 +125,8 @@ No data will be returned.  The data can be accessed through one of the accessor 
 
 ### refresh\_facts
 
-This method needs to be called to populate the `Puppet::DB` object with data from the Puppet DB.  It's a shortcut of `$puppet_db->refresh( 'facts' ) and $puppet_db->facts( $puppet_db->results );` - 
-although it will also populate the `facts` property with the resulting data.
+This method can to be called to populate the [Puppet::DB](https://metacpan.org/pod/Puppet::DB) object with facts data from the Puppet DB.  It does the same as `$puppet_db->refresh( 'facts' ); $puppet_db->facts( $puppet_db->results );` - 
+i.e. it populates the [facts](https://metacpan.org/pod/facts) property as well as the [results](https://metacpan.org/pod/results) property.
 
     $puppet_db->refresh_facts; # Load all facts from the Puppet DB (will be slow for a large instance)
 
@@ -141,13 +141,13 @@ No data will be returned.  The data can be accessed through one of the accessor 
 
 ### results
 
-Return all the results gathered form the last ["refresh"](#refresh)
+Return all the results gathered from the last ["refresh"](#refresh) (including anything that calls [refresh](https://metacpan.org/pod/refresh) indirectly - i.e. it can only be trusted if used immediately after calling [refresh](https://metacpan.org/pod/refresh)).
 
     my $results = $puppet_db->results;
 
 ### facts
 
-Return all the facts gathered form the last ["refresh\_facts"](#refresh_facts)
+Return all the facts gathered from the last ["refresh\_facts"](#refresh_facts)
 
     my $facts = $puppet_db->facts;
 
@@ -212,9 +212,15 @@ This will return true or false based on whether the specified node can be found 
 
 ### is\_hostname\_in\_puppetdb
 
-This will return true or false based on whether the hostname of a node can be found in the Puppet DB.
+This will return the _certname_ if the _hostname_ of a node can be found in the Puppet DB. It will match
+the first _certname_ where the first field matches the _hostname_.
 
     $puppet_db->is_hostname_in_puppetdb( 'testhost' );
+
+If a hostname is provided with dots in it, it will be assumed to be a _certname_ and simply returned back if 
+it is found in the PuppetDB.
+
+False (i.e. 0) is returned if it is not found in the PuppetDB.
 
 # FUNCTIONS
 
